@@ -1,0 +1,66 @@
+cabal-version:      3.0
+name:               alpha
+version:            0.1.0.0
+license:            MIT
+license-file:       LICENSE
+author:             Sharif Parish
+maintainer:         saintparish6@gmail.com
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+
+common warnings
+    ghc-options: -Wall
+
+common shared-deps
+    build-depends:
+        base ^>=4.18.3.0,
+        text,
+        bytestring,
+        containers,
+        time,
+        scientific,
+        vector
+
+library
+    import:           warnings, shared-deps
+    exposed-modules:
+        Alpha.Types
+        Alpha.Data
+        Alpha.Strategy
+        Alpha.Strategy.Helpers
+        Alpha.Engine
+        Alpha.Metrics
+        Alpha.CLI
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable alpha
+    import:           warnings
+    main-is:          Main.hs
+    hs-source-dirs:   app
+    build-depends:
+        base ^>=4.18.3.0,
+        alpha
+    default-language: Haskell2010
+
+test-suite alpha-test
+    import:           warnings
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    other-modules:
+        TestHelpers
+        Alpha.TypesSpec
+        Alpha.DataSpec
+        Alpha.StrategySpec
+        Alpha.EngineSpec
+        Alpha.MetricsSpec
+        Alpha.CLISpec
+        Alpha.EdgeCasesSpec
+    build-depends:
+        base ^>=4.18.3.0,
+        alpha,
+        hspec,
+        QuickCheck
+    build-tool-depends: hspec-discover:hspec-discover
+    default-language: Haskell2010
