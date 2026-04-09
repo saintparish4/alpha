@@ -14,6 +14,7 @@ common warnings
 common shared-deps
     build-depends:
         base ^>=4.18.3.0,
+        cassava, 
         text,
         bytestring,
         containers,
@@ -60,7 +61,11 @@ test-suite alpha-test
     build-depends:
         base ^>=4.18.3.0,
         alpha,
+        bytestring,
         hspec,
-        QuickCheck
+        QuickCheck,
+        scientific,
+        time,
+        vector
     build-tool-depends: hspec-discover:hspec-discover
     default-language: Haskell2010
