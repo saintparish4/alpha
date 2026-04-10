@@ -67,5 +67,4 @@ test-suite alpha-test
         scientific,
         time,
         vector
-    build-tool-depends: hspec-discover:hspec-discover
     default-language: Haskell2010

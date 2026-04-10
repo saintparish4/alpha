@@ -1,5 +1,6 @@
 module TestHelpers where
 
+import Alpha.Strategy
 import Alpha.Types
 import Data.Scientific (Scientific, fromFloatDigits)
 import Data.Time (UTCTime, addUTCTime, secondsToNominalDiffTime)
@@ -40,3 +41,29 @@ genPrice = fromFloatDigits <$> (choose (1.0, 500.0) :: Gen Double)
 
 genVolume :: Gen Scientific
 genVolume = fromFloatDigits <$> (choose (0.0, 10000.0) :: Gen Double)
+
+-- | Build a bar at a given hour offset with all OHLC fields equal to the
+--   supplied price. Useful for tests that need precise control over
+--   open/close prices.
+mkTestBar :: Int -> Scientific -> Bar
+mkTestBar hourIdx price =
+  Bar
+    { barTimestamp =
+        addUTCTime
+          (secondsToNominalDiffTime (fromIntegral hourIdx * 3600))
+          epoch,
+      barOpen = price,
+      barHigh = price,
+      barLow = price,
+      barClose = price,
+      barVolume = 1000
+    }
+  where
+    epoch = posixSecondsToUTCTime 0
+
+-- | Run a strategy over a list of bars and collect signals.
+scanStrategy :: (Strategy s) => s -> [Bar] -> [Signal]
+scanStrategy strat = go (initStrategy strat)
+  where
+    go _ [] = []
+    go st (b : bs) = let (st', sig) = onBar strat st b in sig : go st' bs
