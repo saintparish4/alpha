@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeFamilies #-}
+
 module TestHelpers where
 
 import Alpha.Strategy
@@ -60,6 +62,16 @@ mkTestBar hourIdx price =
     }
   where
     epoch = posixSecondsToUTCTime 0
+
+-- | A test-only strategy that replays a fixed list of signals in order,
+--   returning Hold once the list is exhausted.
+newtype FixedSignals = FixedSignals [Signal]
+
+instance Strategy FixedSignals where
+  type State FixedSignals = [Signal]
+  initStrategy (FixedSignals sigs) = sigs
+  onBar _ [] _ = ([], Hold)
+  onBar _ (s : ss) _ = (ss, s)
 
 -- | Run a strategy over a list of bars and collect signals.
 scanStrategy :: (Strategy s) => s -> [Bar] -> [Signal]
