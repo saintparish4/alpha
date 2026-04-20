@@ -7,6 +7,7 @@ import Alpha.Types
 import Data.Scientific (Scientific, fromFloatDigits)
 import Data.Time (UTCTime, addUTCTime, secondsToNominalDiffTime)
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
+import qualified Data.Vector as V
 import Test.QuickCheck
 
 -- | Arbitrary valid Bar with high >= low and non-negative fields.
@@ -62,6 +63,38 @@ mkTestBar hourIdx price =
     }
   where
     epoch = posixSecondsToUTCTime 0
+
+-- ── Generators for metrics / equity ───────────────────────────────
+
+-- | Generate a single ClosedTrade with randomised prices and fees.
+genClosedTrade :: Gen ClosedTrade
+genClosedTrade = do
+  hourOffset <- choose (0, 1000 :: Int)
+  entryPrice <- genPrice
+  exitPrice <- genPrice
+  shares <- genPrice
+  entryFee <- fromFloatDigits <$> (choose (0.0, 5.0) :: Gen Double)
+  exitFee <- fromFloatDigits <$> (choose (0.0, 5.0) :: Gen Double)
+  let entryTime =
+        addUTCTime (secondsToNominalDiffTime (fromIntegral hourOffset * 3600)) epoch
+      exitTime =
+        addUTCTime (secondsToNominalDiffTime (fromIntegral (hourOffset + 1) * 3600)) epoch
+  pure
+    ClosedTrade
+      { ctEntryTime = entryTime,
+        ctEntryPrice = entryPrice,
+        ctExitTime = exitTime,
+        ctExitPrice = exitPrice,
+        ctShares = shares,
+        ctEntryFee = entryFee,
+        ctExitFee = exitFee
+      }
+  where
+    epoch = posixSecondsToUTCTime 0
+
+-- | Generate an equity curve of length n with positive prices.
+genEquityCurve :: Int -> Gen (V.Vector Scientific)
+genEquityCurve n = V.fromList <$> vectorOf n genPrice
 
 -- | A test-only strategy that replays a fixed list of signals in order,
 --   returning Hold once the list is exhausted.

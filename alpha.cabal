@@ -14,7 +14,9 @@ common warnings
 common shared-deps
     build-depends:
         base ^>=4.18.3.0,
-        cassava, 
+        aeson,
+        cassava,
+        optparse-applicative,
         text,
         bytestring,
         containers,
@@ -61,8 +63,11 @@ test-suite alpha-test
     build-depends:
         base ^>=4.18.3.0,
         alpha,
+        aeson,
         bytestring,
+        directory,
         hspec,
+        optparse-applicative,
         QuickCheck,
         scientific,
         time,

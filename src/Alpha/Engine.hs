@@ -11,7 +11,7 @@ where
 import Alpha.Strategy 
 import Alpha.Types 
 import Data.Foldable (foldl') 
-import Data.Scientific (Scientific) 
+import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import qualified Data.Vector as V  
 
 -- ── Strict accumulator ──────────────────────────────────────────
@@ -95,7 +95,10 @@ execAction :: FeeModel -> Action -> Bar -> EngineState s -> EngineState s
 execAction _ DoNothing _ es = es 
 execAction _ Enter bar es = 
     let !entryPrice = barOpen bar 
-        !shares = esCash es / entryPrice 
+        -- Division performed in Double to avoid Scientific's non-terminating
+        -- loop when cash / price has a repeating decimal expansion.
+        !shares = fromFloatDigits
+                    (toRealFloat (esCash es) / toRealFloat entryPrice :: Double)
         !pos = 
             Position 
             { posEntryTime = barTimestamp bar, 
