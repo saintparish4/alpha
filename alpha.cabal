@@ -31,6 +31,8 @@ library
         Alpha.Data
         Alpha.Strategy
         Alpha.Strategy.Helpers
+        Alpha.Strategy.BuyHold
+        Alpha.Strategy.Momentum
         Alpha.Engine
         Alpha.Metrics
         Alpha.CLI
