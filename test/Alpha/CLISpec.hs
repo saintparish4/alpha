@@ -10,6 +10,7 @@ import Alpha.Strategy (SmaCrossover (..))
 import Alpha.Types
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Vector as V
 import Options.Applicative
   ( ParserResult (..),
     defaultPrefs,
@@ -93,7 +94,7 @@ spec = describe "Alpha.CLI" $ do
       bs <- BL.readFile "test/fixtures/sample.csv"
       let bars   = either (error . show) id (ingestCSV bs)
           result = runBacktest NoFee 10000 (SmaCrossover 3 5) bars
-      length (show (brEquityCurve result)) `shouldSatisfy` (> 0) -- non-empty
+      V.length (brEquityCurve result) `shouldSatisfy` (> 0) -- non-empty
 
     it "barCount equals number of bars in sample.csv" $ do
       bs <- BL.readFile "test/fixtures/sample.csv"
